@@ -1,9 +1,9 @@
 libevl
 ===========
 
-This library is an Yet Another(tm) library for abstracting event
-handling, like `libevent` or `libev`. It aims to be familiar to
-users of `libevent`, and simple and robust to use.
+`libevl` Yet Another(tm) library for abstracting event handling,
+like `libevent` or `libev`. It aims to be familiar to users of
+`libevent`, and simple and robust to use.
 
 This was written as a result of spending time reimplimenting the
 `libevent` API, which led to the realisation that users of the API
