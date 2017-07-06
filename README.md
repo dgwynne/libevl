@@ -24,7 +24,7 @@ Secondly, the API is arranged so adding and deleteing events cannot
 fail. Instead, all the steps that may fail when setting up event
 handling in a backend (e.g., poll or kqueue) are pushed to the
 allocation of the event. This also allows for hiding of the contents
-of the various structures, which in turn avoids .
+of the various structures.
 
 Todo
 ---
