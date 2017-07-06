@@ -17,6 +17,8 @@ the main differences between `libevl` and `libevent`.
 Firstly, file descriptor monitoring and timeout handling are separated
 into different types and interfaces to avoid confusion about their
 interactions as found in `libevent`'s `event_add()` interface.
+File descriptor monitoring is handled with `struct evl_io`, and
+timeouts are handled with `struct evl_tmo`.
 
 Secondly, the API is arranged so adding and deleteing events cannot
 fail. Instead, all the steps that may fail when setting up event
