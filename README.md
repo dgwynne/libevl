@@ -30,6 +30,7 @@ Todo
 ---
 
 - Implement a `poll()` backend.
+- Implement an event port backend for Solaris and Illumos.
 - Implement abstraction of signal handling
 - Implement abstraction of `wait()` handling.
 
