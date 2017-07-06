@@ -1,0 +1,160 @@
+.\"	$OpenBSD$
+.\"
+.\" Copyright (c) 2017 David Gwynne <dlg@openbsd.org>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: July 6 2017 $
+.Dt EVL_IO_CREATE 3
+.Os
+.Sh NAME
+.Nm evl_io_create ,
+.Nm evl_io_add ,
+.Nm evl_io_del ,
+.Nm evl_io_destroy
+.Nm evl_io_fd ,
+.Nm evl_io_set ,
+.Nm evl_io_pending
+.Nd event loop library input/output event handling
+.Sh SYNOPSIS
+.In evl.h
+.Ft struct evl_io *
+.Fo evl_io_create
+.Fa "struct event_base *evlb"
+.Fa "int fd"
+.Fa "int events"
+.Fa "void (*fn)(int, int, void *)"
+.Fa "void *arg"
+.Fc
+.Ft int
+.Fn evl_io_add "struct evl_io *evlio"
+.Ft int
+.Fn evl_io_del "struct evl_io *evlio"
+.Ft void
+.Fn evl_io_destroy "struct evl_io *evlio"
+.Ft int
+.Fn evl_io_fd "const struct evl_io *evlio"
+.Ft void
+.Fn evl_io_set "struct evl_io *evlio" "void (*fn)(int, int, void *)"
+.Ft int
+.Fn evl_io_pending "const struct evl_io *evlio"
+.Sh DESCRIPTION
+The Event Loop input/output API allows for the monitoring of events
+on file descriptors.
+.Pp
+.Fn evl_io_create
+allocates and initialises an
+.Vt evl_io
+structure for monitoring events in the
+.Fa evlb
+event loop.
+The file descriptor to monitor is specified by
+.Fa fd .
+The configuration of the file descriptor monitoring is specified by the
+.Fa events
+argument as a bitwise or of the flags described below.
+The function to call when an event fires is specified by
+.Fa fn .
+When an event fires, the
+.Fa fn
+function will be called with the file descriptor as the first argument,
+the bitwise or of the conditions which caused the event to fire, and
+.Fa arg
+as its last argument.
+.Pp
+The flags that can be used to configure the event are:
+.Bl -tag -offset indent
+.It Dv EVL_READ
+The event handler will fire when the file descriptor becomes readable.
+.It Dv EVL_WRITE
+The event handler will fire when the file descriptor becomes
+writeable.
+.It Dv EVL_PERSIST
+The event handler will remain enabled between fires of the event
+handler until it is disabled with
+.Fn evl_io_del .
+Without this flag the event must be explicitly re-added to the event
+loop with
+.Fa evl_io_add
+before it can fire again.
+.El
+.Pp
+.Fn evl_io_add
+enables the monitoring of the file descriptor events in
+.Fa evlio
+to be monitored by the event loop.
+.Fn evl_io_add
+may be called at any time after
+.Fn evl_io_create ,
+even if the event has already been added to the event loop.
+.Pp
+.Fn evl_io_del
+disables the monitoring of the file descriptor events in
+.Fa evlio
+by the event loop.
+.Fn evl_io_del
+may be called at any time after
+.Fn evl_io_create ,
+even if the event is not currently on the event loop.
+.Pp
+.Fn evl_io_destroy
+frees the resources associated with
+.Fa evlio .
+.Fa evlio
+must not be on the event loop when
+.Fa evl_io_destroy
+is called.
+.Pp
+.Fn evl_io_fd
+provides the file descriptor that
+.Fa evlio
+was created with.
+.Pp
+.Fn evl_io_set
+changes the callback function associated with
+.Fa evlio
+to the one specified with
+.Fa fn .
+.Fn evl_io_set may be called at any time.
+.Pp
+.Fn elv_io_pending
+returns whether
+.Fa evlio
+is currently added to the event loop.
+.Sh RETURN VALUES
+.Fn evl_io_create
+returns a pointer to a newly allocated
+.Vt evl_io
+structure on success, or
+.Dv NULL
+on failure and sets
+.Va errno
+to indicate the failure.
+.Pp
+.Fn evl_io_add
+returns 1 if the event was added to the event loop, or 0 if it was
+already enabled.
+.Pp
+.Fn evl_io_del
+returns 1 if the event was removed from the event loop, or 0 if it
+was already disabled.
+.Pp
+.Fn evl_io_fd
+returns the file descriptor that is being monitored for events.
+.Pp
+.Fn evl_io_pending
+returns 1 if the event is enabled on the event loop, or 0 if it is
+disabled.
+.Sh SEE ALSO
+.Xr errno 2 ,
+.Xr evl_init 3

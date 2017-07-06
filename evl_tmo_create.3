@@ -1,0 +1,142 @@
+.\"	$OpenBSD$
+.\"
+.\" Copyright (c) 2017 David Gwynne <dlg@openbsd.org>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate: July 6 2017 $
+.Dt EVL_TMO_CREATE 3
+.Os
+.Sh NAME
+.Nm evl_tmo_create ,
+.Nm evl_tmo_add ,
+.Nm evl_tmo_del ,
+.Nm evl_tmo_destroy
+.Nm evl_tmo_set ,
+.Nm evl_tmo_pending
+.Nd event loop library timeout event handling
+.Sh SYNOPSIS
+.In time.h
+.In evl.h
+.Ft struct evl_tmo *
+.Fo evl_tmo_create
+.Fa "struct event_base *evlb"
+.Fa "void (*fn)(int, int, void *)"
+.Fa "void *arg"
+.Fc
+.Ft int
+.Fn evl_tmo_add "struct evl_tmo *evlt" "const struct timespec *ts"
+.Ft int
+.Fn evl_tmo_del "struct evl_tmo *evlt"
+.Ft void
+.Fn evl_tmo_destroy "struct evl_tmo *evlt"
+.Ft int
+.Fn evl_tmo_fd "const struct evl_tmo *evlt"
+.Ft void
+.Fn evl_tmo_set "struct evl_tmo *evlt" "void (*fn)(int, int, void *)"
+.Ft int
+.Fn evl_tmo_pending "const struct evl_tmo *evlt" "struct timespec *ts"
+.Sh DESCRIPTION
+The Event Loop timeout API allows for scheduling of handlers to be called
+after a timeout expires.
+.Pp
+.Fn evl_tmo_create
+allocates and initialises an
+.Vt evl_tmo
+structure that can be used to schedule a timeout in the
+.Fa evlb
+event loop.
+When the timeout expires, the
+.Fa fn
+function will be called with 0 as the first argument,
+.Dv EVL_TIMEOUT as the conditions which caused the event to fire, and
+.Fa arg
+as its last argument.
+.Pp
+.Fn evl_tmo_add
+schedules
+.Fa evlt
+to fire after the interval specified by
+.Fa ts.
+If
+.Fa evlt
+was already scheduled on the event loop, it is modified to fire
+after the new interval.
+.Pp
+.Fn evl_tmo_del
+removes
+.Fa evlt
+from the event loop.
+.Fn evl_tmo_del
+may be called at any time after
+.Fn evl_tmo_create ,
+even if the timeout is not currently scheduled on the event loop.
+.Pp
+.Fn evl_tmo_destroy
+frees the resources associated with
+.Fa evlt .
+.Fa evlt
+must not be on the event loop when
+.Fa evl_tmo_destroy
+is called.
+.Pp
+.Fn evl_tmo_set
+changes the callback function associated with
+.Fa evlt
+to the one specified with
+.Fa fn .
+.Fn evl_tmo_set may be called at any time.
+.Pp
+.Fn elv_tmo_pending
+returns whether
+.Fa evlt
+is currently added to the event loop.
+If
+.Fa ts
+is not
+.Dv NULL
+and the timeout is scheduled, the remaining interval before the
+timeout is due to fire is returned via this argument.
+.Sh RETURN VALUES
+.Fn evl_tmo_create
+returns a pointer to a newly allocated
+.Vt evl_tmo
+structure on success, or
+.Dv NULL
+on failure and sets
+.Va errno
+to indicate the failure.
+.Pp
+.Fn evl_tmo_add
+returns 1 if the timeout was newly scheduled on the event loop, or
+0 if the timeout was already scheduled.
+.Pp
+.Fn evl_tmo_del
+returns 1 if the timeout was removed from the event loop, or 0 if it
+was already not scheduled.
+.Pp
+.Fn evl_tmo_pending
+returns 1 if the timeout is scheduled on the event loop, or 0 if it is
+disabled.
+.Fn evl_tmo_pending
+may return -1 and set
+.Va errno
+if
+.Fa ts
+is not
+.Dv NULL
+but the function was unable to read the clock to calculate the
+remaining interval.
+.Sh SEE ALSO
+.Xr errno 2 ,
+.Xr evl_init 3
