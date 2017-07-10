@@ -208,8 +208,6 @@ evl_kq_io_create(struct evl_io *evlio)
 		EV_SET(kev, fd, EVFILT_WRITE, flags, 0, 0, evlio);
 	}
 
-	fflush(stdout);
-
 	/* commit */
 	evlio->evl_io_idx = evlkq->evlkq_nchanges;
 	evlkq->evlkq_nchanges += n;
