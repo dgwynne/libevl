@@ -1,13 +1,13 @@
 libevl
 ===========
 
-`libevl` Yet Another(tm) library for abstracting event handling,
+`libevl` is Yet Another(tm) library for abstracting event handling,
 like `libevent` or `libev`. It aims to be familiar to users of
 `libevent`, and simple and robust to use.
 
 This was written as a result of spending time reimplimenting the
 `libevent` API, which led to the realisation that users of the API
-generally do not correctly handle errors, ie, noone checks for the
+generally do not correctly handle errors, ie, no one checks for the
 errors that `event_add()` and `event_del()` return. Additionally,
 some aspects of the API are hard to reason about, eg, it is not
 obvious what will happen with an event set with `EV_PERSIST` and a
