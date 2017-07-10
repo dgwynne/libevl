@@ -5,7 +5,7 @@
 LIB=	evl
 SRCS=	evl.c
 SRCS+=	evl-kqueue.c
-#SRCS+=	evl-poll.c
+SRCS+=	evl-poll.c
 SRCS+=	heap.c
 HDRS=	evl.h
 MAN=	evl_init.3 evl_io_create.3 evl_tmo_create.3

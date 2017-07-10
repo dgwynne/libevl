@@ -27,11 +27,9 @@ extern const struct evl_ops evl_ops_kq;
 #endif
 #endif
 
-#if 0
 extern const struct evl_ops evl_ops_poll;
 #ifndef EVL_DEFAULT_OPS
 #define EVL_DEFAULT_OPS	(&evl_ops_poll)
-#endif
 #endif
 
 #endif /* _LIB_EVL_OPTIONS_H_ */
