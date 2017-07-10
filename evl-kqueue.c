@@ -54,8 +54,6 @@ struct evl_kq {
 	unsigned int	 evlkq_nchanges;
 };
 
-#include <stdio.h>
-
 static void *
 evl_kq_init(void)
 {
@@ -78,8 +76,6 @@ evl_kq_init(void)
 	evlkq->evlkq_nevents = 0;
 	evlkq->evlkq_nchanges = 0;
 
-	printf("%s %p fd %d\n", __func__, evlkq, fd);
-
 	return (evlkq);
 }
 
@@ -98,9 +94,6 @@ evl_kq_io_fire(const struct kevent *kev, int events)
 {
 	struct evl_io *evlio;
 	struct evl_work *evl;
-
-	printf("%s f %d id %d 0x%x %llx\n", __func__, kev->filter,
-	    (int)kev->ident, kev->flags, kev->data);
 
 	if (ISSET(kev->flags, EV_ERROR)) {
 		switch (kev->data) {
@@ -196,8 +189,6 @@ evl_kq_io_create(struct evl_io *evlio)
 	int flags = EV_ADD | EV_DISABLE | EV_RECEIPT;
 	int fd;
 
-	printf("%s %p\n", __func__, evlio);
-
 	fd = evl->evl_ident;
 	n = 0;
 
@@ -217,7 +208,6 @@ evl_kq_io_create(struct evl_io *evlio)
 		EV_SET(kev, fd, EVFILT_WRITE, flags, 0, 0, evlio);
 	}
 
-	printf("%s fd %d %x nchanges %u\n", __func__, fd, evl->evl_event, n);
 	fflush(stdout);
 
 	/* commit */
@@ -277,8 +267,6 @@ evl_kq_io_add(struct evl_io *evlio)
 	struct evl_work *evl = &evlio->evl_io_work;
 	int flags = EV_ENABLE | EV_RECEIPT;
 
-	printf("%s %p\n", __func__, evlio);
-
 	if (ISSET(evl->evl_event, EVL_RW) != EVL_RW &&
 	    !ISSET(evl->evl_event, EVL_PERSIST))
 		SET(flags, EV_DISPATCH);
@@ -290,8 +278,6 @@ static void
 evl_kq_io_del(struct evl_io *evlio)
 {
 	int flags = EV_DISABLE | EV_RECEIPT;
-
-	printf("%s %p\n", __func__, evlio);
 
 	evl_kq_io(evlio, flags);
 }
@@ -311,8 +297,6 @@ evl_kq_io_destroy(struct evl_io *evlio)
 	struct kevent *kev, *nkev;
 	unsigned int nevents, n, idx;
 	int fd;
-
-	printf("%s %p\n", __func__, evlio);
 
 	idx = evlio->evl_io_idx;
 	if (idx == ~0U) { /* new changes */

@@ -143,9 +143,6 @@ evl_init(void)
 	return (evlb);
 }
 
-#include <unistd.h>
-#include <stdio.h>
-
 int
 evl_dispatch(struct evl_base *evlb)
 {
@@ -153,19 +150,15 @@ evl_dispatch(struct evl_base *evlb)
 	struct evl_work *evl;
 	struct timespec *ts;
 	int fires;
-printf("%d %s %u\n", getpid(), __func__, __LINE__);
 
 	evlb->evlb_running = 1;
 	for (;;) {
 		if (evl_monotime(&now.evl_tmo_deadline) == -1)
 			return (-1);
 
-printf("%d %s %u\n", getpid(), __func__, __LINE__);
 		while ((evlt = evlb_tmo_cextract(evlb, &now)) != NULL) {
-printf("%d %s %p\n", getpid(), __func__, evlt);
 			CLR(evlt->evl_tmo_work.evl_event, EVL_PENDING);
 			evl_work_add(&evlt->evl_tmo_work, EVL_TIMEOUT);
-printf("%d %s %u\n", getpid(), __func__, __LINE__);
 		}
 
 		while ((evl = evlb_work_first(evlb)) != NULL) {
@@ -173,14 +166,12 @@ printf("%d %s %u\n", getpid(), __func__, __LINE__);
 			fires = evl->evl_fires;
 			evl->evl_fires = 0;
 
-printf("%d %s %u\n", getpid(), __func__, __LINE__);
 			(*evl->evl_fn)(evl->evl_ident, fires, evl->evl_arg);
 
 			if (!evlb->evlb_running)
 				return (0);
 		}
 
-printf("%d %s %u\n", getpid(), __func__, __LINE__);
 		evlt = evlb_tmo_first(evlb);
 		if (evlt != NULL) {
 			ts = &now.evl_tmo_deadline;
@@ -188,7 +179,6 @@ printf("%d %s %u\n", getpid(), __func__, __LINE__);
 		} else
 			ts = NULL;
 
-printf("%d %s %u\n", getpid(), __func__, __LINE__);
 		if (evl_op_dispatch(evlb, ts) == -1)
 			return (-1);
 	}
@@ -390,8 +380,6 @@ evl_tmo_create(struct evl_base *evlb,
 
 	evl_work_init(&evlt->evl_tmo_work, evlb, 0, 0, fn, arg);
 
-printf("%d %s %p\n", getpid(), __func__, evlt);
-
 	return (evlt);
 }
 
@@ -402,8 +390,6 @@ evl_tmo_add(struct evl_tmo *evlt, const struct timespec *offset)
 	struct evl_base *evlb = evl->evl_base;
 	struct timespec now;
 	int rv = 0;
-
-printf("%d %s %p\n", getpid(), __func__, evlt);
 
 	if (evl_monotime(&now) == -1)
 		return (-1);
@@ -456,8 +442,6 @@ evl_tmo_del(struct evl_tmo *evlt)
 	struct evl_work *evl = &evlt->evl_tmo_work;
 	struct evl_base *evlb = evl->evl_base;
 	int rv = 0;
-
-printf("%d %s %p\n", getpid(), __func__, evlt);
 
 	if (evl_work_del(evl))
 		rv = 1;
